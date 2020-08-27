@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
 
-    EditText emailId, address, phone, password, name;
+    EditText name,emailId, address, phone, password;
     Button signUp;
 
     @Override
