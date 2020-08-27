@@ -11,15 +11,23 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    SignUpResponse signUpResponsesData;
-    EditText emailId, password, name;
+
+    EditText emailId, address, phone, password, name;
     Button signUp;
 
     @Override
@@ -27,21 +35,59 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // init the EditText and Button
-        name = (EditText) findViewById(R.id.username);
+        name = (EditText) findViewById(R.id.name);
+        address = (EditText) findViewById(R.id.address);
+        phone=(EditText) findViewById(R.id.phone);
         emailId = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
         signUp = (Button) findViewById(R.id.signUp);
         // implement setOnClickListener event on sign up Button
+        
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // validate the fields and call sign method to implement the api
-                if (validate(name) && validateEmail() && validate(password)) {
-                    signUp();
+                if (validate(name) && validate(address) && validateEmail() && validate(phone)&& validate(password)) {
+                    insertUser();
                 }
             }
         });
     }
+
+    private void insertUser(){
+        RestAdapter adapter= new RestAdapter.Builder().setEndpoint("file:///C:/xampp/newxampp/htdocs/").build();
+        RegisterAPI api= adapter.create(RegisterAPI.class);
+        api.insertUser(name.getText().toString(),address.getText().toString(),emailId.getText().toString(),
+                phone.getText().toString(),password.getText().toString(),
+                new Callback<Response>(){
+
+                    @Override
+                    public void success(Response response, Response response2) {
+                        BufferedReader reader=null;
+                        String output="";
+                        try{
+                            reader=new BufferedReader(new InputStreamReader(response.getBody().in()));
+                            output=reader.readLine();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(MainActivity.this,output,Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_LONG).show();
+
+                    }
+                }
+
+
+
+        );
+        
+
+    }
+
     private boolean validateEmail() {
         String email = emailId.getText().toString().trim();
 
@@ -53,6 +99,9 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+
+
 
     private static boolean isValidEmail(String email) {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
@@ -68,36 +117,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void signUp() {
-        // display a progress dialog
-        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setCancelable(false); // set cancelable to false
-        progressDialog.setMessage("Please Wait"); // set message
-        progressDialog.show(); // show progress dialog
 
-        // Api is a class in which we define a method getClient() that returns the API Interface class object
-        // registration is a POST request type method in which we are sending our field's data
-        // enqueue is used for callback response and error
-        (Api.getClient().registration(name.getText().toString().trim(),
-                emailId.getText().toString().trim(),
-                password.getText().toString().trim(),
-                "email")).enqueue(new Callback<SignUpResponse>() {
-            @Override
-            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
-                signUpResponsesData = response.body();
-                Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
-
-            }
-
-            @Override
-            public void onFailure(Call<SignUpResponse> call, Throwable t) {
-                Log.d("response", t.getStackTrace().toString());
-                progressDialog.dismiss();
-
-            }
-        });
-    }
 
 
 }
