@@ -6,3 +6,5 @@ Implemented Android application with UI for Singup page. The fields have data va
 4. Phone number (should be at least 10 number + country code)
 5. Password (must contain one upper character, one lower character and a number. Max length 15 and min length 8)
 I have used Retrofit and GSON to implement the database backend side and viewed through phpMyAdmin. Implemented on localserver.
+APK Link:
+https://drive.google.com/file/d/1Y0VrK_xNM09gchLoO14fNE3JMkaQx4RO/view?usp=sharing
