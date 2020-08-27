@@ -14,6 +14,8 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit.Callback;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // validate the fields and call sign method to implement the api
-                if (validate(name) && validate(address) && validateEmail() && validate(phone)&& validate(password)) {
+                if (validateName(name) && validateAdress(address) && validateEmail() && validatePhone(phone)&& isValidPassword(password)) {
                     insertUser();
                 }
             }
@@ -100,6 +102,52 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private boolean validateName(EditText editText) {
+        // check the length of the enter data in EditText and give error if its empty
+        if (editText.getText().toString().trim().length() > 4) {
+            return true; // returns true if field is not empty
+        }
+        editText.setError("Insert more characters");
+        editText.requestFocus();
+        return false;
+    }
+
+    private boolean validateAdress(EditText editText) {
+        // check the length of the enter data in EditText and give error if its empty
+        if (editText.getText().toString().trim().length() > 10) {
+            return true; // returns true if field is not empty
+        }
+        editText.setError("Insert more characters");
+        editText.requestFocus();
+        return false;
+    }
+
+    private boolean validatePhone(EditText editText) {
+        // check the length of the enter data in EditText and give error if its empty
+        String regexStr = "^[+]?[0-9]{10,15}$";
+        String number=editText.getText().toString().trim();
+        if (editText.getText().toString().trim().length() > 10 && number.matches(regexStr)==true) {
+            return true; // returns true if field is not empty
+        }
+        editText.setError("Enter valid phone number with country code");
+        editText.requestFocus();
+        return false;
+    }
+
+    public static boolean isValidPassword(EditText editText) {
+
+        final String password=editText.getText().toString().trim();
+
+        Pattern pattern;
+        Matcher matcher;
+        final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,15}$";
+        pattern = Pattern.compile(PASSWORD_PATTERN);
+        matcher = pattern.matcher(password);
+
+        return matcher.matches();
+
+    }
+
 
 
 
@@ -108,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validate(EditText editText) {
-        // check the lenght of the enter data in EditText and give error if its empty
+        // check the length of the enter data in EditText and give error if its empty
         if (editText.getText().toString().trim().length() > 0) {
             return true; // returns true if field is not empty
         }
